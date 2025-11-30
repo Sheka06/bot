@@ -4,7 +4,7 @@ import logging
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
 from aiogram.types import FSInputFile
-from aiogram.webhook.aiohttp_server import SimpleRequestHandler, aiohttp_server
+from aiogram.webhook.aiohttp_server import SimpleRequestHandler
 from aiohttp import web
 import yt_dlp
 from mutagen.easyid3 import EasyID3
