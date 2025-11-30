@@ -19,7 +19,12 @@ COVER_PATH = "cover.jpg"
 # Логи
 logging.basicConfig(level=logging.INFO)
 
-bot = Bot(token=BOT_TOKEN, parse_mode="HTML")
+from aiogram.types import BotProperties   # добавь эту строку сверху, если её ещё нет
+
+bot = Bot(
+    token=BOT_TOKEN,
+    default=BotProperties(parse_mode="HTML")
+)
 dp = Dispatcher()
 
 # Команда /start
