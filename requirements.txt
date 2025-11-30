@@ -1,5 +1,4 @@
 aiogram==3.13.1
 yt-dlp>=2025.11.30
-fix yt-dlp version
 mutagen==1.47.0
 aiohttp==3.10.5
