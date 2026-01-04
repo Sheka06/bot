@@ -9,7 +9,7 @@ from mutagen.id3 import ID3, APIC
 BOT_TOKEN = "8285787019:AAGb2taeKw6e6CdnfFnUdx7xyf2zX6SU908"
 CHANNEL_ID = "@sheka_muzic"
 CHANNEL_LINK = "https://t.me/sheka_muzic"
-COVER_PATH = "cover.jpg" # <--- Твоя обложка (фон)
+COVER_PATH = "custom_cover.jpg" # <--- Твоя обложка (фон)
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 # === Команда /start ===
