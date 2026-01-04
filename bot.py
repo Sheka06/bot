@@ -12,10 +12,11 @@ import yt_dlp
 from mutagen.easyid3 import EasyID3
 from mutagen.id3 import ID3, APIC
 
+# Настройки
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 CHANNEL_ID = "@sheka_muzic"
 CHANNEL_LINK = "https://t.me/sheka_muzic"
-COVER_PATH = "cover.jpg"
+CUSTOM_COVER = "custom_cover.jpg"  # Твоя кастомная обложка (Honda Fit)
 
 logging.basicConfig(level=logging.INFO)
 
@@ -24,7 +25,7 @@ dp = Dispatcher()
 
 @dp.message(Command("start"))
 async def start_cmd(message: types.Message):
-    await message.answer("Отправь ссылку на YouTube — я загружу трек и добавлю фон")
+    await message.answer("Отправь ссылку на YouTube — я скачаю трек с твоей кастомной обложкой (Honda Fit) 🔥")
 
 @dp.message()
 async def handle_message(message: types.Message):
@@ -32,13 +33,12 @@ async def handle_message(message: types.Message):
         await message.answer("Отправь ссылку на видео с YouTube.")
         return
 
-    await message.answer("Скачиваю трек... Подожди немного")
+    status_msg = await message.answer("Скачиваю трек... Подожди немного ⏳")
 
     url = message.text
-    output_file = "music.%(ext)s"
     ydl_opts = {
         "format": "bestaudio/best",
-        "outtmpl": output_file,
+        "outtmpl": "music.%(ext)s",
         "postprocessors": [{
             "key": "FFmpegExtractAudio",
             "preferredcodec": "mp3",
@@ -54,14 +54,16 @@ async def handle_message(message: types.Message):
             title = info.get("title", "Музыка")
         filename = "music.mp3"
 
+        # Метаданные
         audio = EasyID3(filename)
         audio["title"] = title
         audio["artist"] = "SHEKAmuzic"
         audio.save()
 
-        if os.path.exists(COVER_PATH):
+        # === ВСТАВЛЯЕМ ТВОЮ КАСТОМНУЮ ОБЛОЖКУ ===
+        if os.path.exists(CUSTOM_COVER):
             audiofile = ID3(filename)
-            with open(COVER_PATH, "rb") as f:
+            with open(CUSTOM_COVER, "rb") as f:
                 audiofile["APIC"] = APIC(
                     encoding=3,
                     mime="image/jpeg",
@@ -71,25 +73,28 @@ async def handle_message(message: types.Message):
                 )
             audiofile.save(v2_version=3)
 
+        # Отправка в канал с твоей обложкой
         await bot.send_audio(
             chat_id=CHANNEL_ID,
             audio=FSInputFile(filename),
             caption=CHANNEL_LINK,
             title=title,
             performer="SHEKAmuzic",
-            thumbnail=FSInputFile(COVER_PATH) if os.path.exists(COVER_PATH) else None
+            thumbnail=FSInputFile(CUSTOM_COVER) if os.path.exists(CUSTOM_COVER) else None
         )
 
-        await message.answer("Трек успешно загружен и опубликован в канал!")
+        await status_msg.edit_text("Трек загружен в канал с твоей кастомной обложкой (Honda Fit)! 🔥")
 
+        # Удаление временных файлов (обложку не трогаем)
         for f in [filename, "music.webm"]:
             if os.path.exists(f):
                 os.remove(f)
 
     except Exception as e:
         logging.error(f"Ошибка: {e}")
-        await message.answer(f"Ошибка при загрузке: {str(e)}")
+        await status_msg.edit_text(f"Ошибка: {str(e)}")
 
+# Веб-сервер
 async def on_startup(app):
     webhook_url = f"https://{os.getenv('RENDER_EXTERNAL_HOSTNAME')}/webhook"
     await bot.set_webhook(webhook_url)
